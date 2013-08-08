@@ -11,7 +11,8 @@ user_favorites = UserFavorites(TreeFavorite, Tree, extra_filter=most_recent)
 
 urlpatterns = patterns('',
     #(r'^$', direct_to_template, {'template':'under_construction.html'}),
-    (r'^$', home_feeds),
+    (r'^$', result_map),
+    #(r'^$', home_feeds),
     (r'^home/$', home_feeds),
     (r'^home/feeds/$', home_feeds),
     (r'^home/feeds/json/$', json_home_feeds),

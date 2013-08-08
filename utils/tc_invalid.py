@@ -14,7 +14,7 @@ from profiles.models import *
 from treemap.models import PointUpdate, TreePhoto
 
 #tilecache_base = "http://tilecache.urbanforestmap.org/tiles/trees/1.0.0/"
-tilecache_base = "http://tilecache.urbanforestmap.org/tiles/1.0.0/trees"
+tilecache_base = "http://49.248.144.117/tilecache/otm"
 
 def lon_lat_to_xy(lon, lat):
     x = lon * 20037508.34 / 180

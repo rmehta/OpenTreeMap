@@ -12,7 +12,8 @@
                                 <ul>
                                     <li id="title">Results:</li>
                                     <li id="first"><span class="tree_count">0</span> trees selected <span class="notrees"></span></li>
-                                    <!-- <li>XX trees need more info to be included</li> -->
+                                    <li>Pilot survey - Prabhags covered: 3,7,8,17,24,36 </li>
+
                                     <li><a href="{% url treemap.views.tree_add %}">Add a tree!</a></li>
                                 </ul>
                             </li>
@@ -31,50 +32,51 @@
             {% endblock heading %}
 
 
-
+	
 
         {% block top_left_panel %}
-
+	<!-- 
             <div id="results_aside" class="aside">
             <h2>Yearly Eco Impact</h2>
             <div id="summary_subset">Selected trees in <span id="summary_subset_val">..</span></div>
-              <!-- <strong class="sub-title">Based on select data. <a href="{% url treemap.views.tree_add %}">Add a tree &raquo;</a></strong> -->
+            <strong class="sub-title">Based on select data. <a href="{% url treemap.views.tree_add %}">Add a tree &raquo;</a></strong> 
 
             <div id="results_wrapper" style="display:none;">
                 <ul id="messageStats">
                     <li class="impact" id="cost">Total Benefits</li>
-                    <li class="impactStat">$<span id="benefits_total"></span><span class="subnote"> saved</span></li>
+                    <li class="impactStat">&#x20b9;<span id="benefits_total"></span><span class="subnote"> saved</span></li>
                 </ul>
                 <ul id="messageStats">
                     <li class="impact" id="gas">Greenhouse Gas Benefits</li>
-                    <li class="impactStat"><span id="annual_co2_avoided"> </span> lbs CO2 <span class="subnote">reduced</span></li>
-                    <li class="impactStat">$<span id="benefits_greenhouse"> </span><span class="subnote"> saved</span></li>
+                    <li class="impactStat"><span id="annual_co2_avoided"> </span> lbs CO<sub>2</sub> <span class="subnote">reduced</span></li>
+                    <li class="impactStat">&#x20b9;<span id="benefits_greenhouse"> </span><span class="subnote"> saved</span></li>
                 </ul>
                 <ul id="messageStats">
                     <li class="impact" id="water">Water Benefits</li>
                     <li class="impactStat"><span id="annual_stormwater_management"></span> gallons <span class="subnote">conserved</span></li>
-                    <li class="impactStat">$<span id="benefits_water"> </span><span class="subnote"> saved</span></li>
+                    <li class="impactStat">&#x20b9;<span id="benefits_water"> </span><span class="subnote"> saved</span></li>
                 </ul>
                 <ul id="messageStats">
                     <li class="impact" id="energy">Energy Benefits</li>
                     <li class="impactStat"><span id="annual_electricity_conserved"> </span> kWh <span class="subnote">conserved</span></li>
-                    <li class="impactStat">$<span id="benefits_energy"> </span><span class="subnote"> saved</span></li>
+                    <li class="impactStat">&#x20b9;<span id="benefits_energy"> </span><span class="subnote"> saved</span></li>
                 </ul>
                 <ul id="messageStats">
                     <li class="impact" id="air">Air Quality Benefits</li>
                     <li class="impactStat"><span id="annual_air_quality_improvement"></span> lbs pollutants <span class="subnote">reduced</span></li>
-                    <li class="impactStat">$<span id="benefits_air_quality"> </span><span class="subnote"> saved</span></li>
+                    <li class="impactStat">&#x20b9;<span id="benefits_air_quality"> </span><span class="subnote"> saved</span></li>
                 </ul>
             </div>
             </div>
-
+	    -->
         {% endblock %}
+	    
 
         {% block top_right_panel %}
             <div class="wrap">
-                <div id="results_map">
-                                        <div class="mapToggle buttomSm">View Satellite</div>
-                </div>
+              <div id="results_map">
+                <div class="mapToggle buttomSm">View Satellite</div>
+              </div>
             </div>
         {% endblock %}
 
@@ -82,8 +84,11 @@
 {% block bottom_left_panel %}
         <div class="box-1">
         <h2>Recent updates</h2>
-        <p>Our database of trees comes from public records and citizen foresters like you.
-            Your help will make it better. <!--<a href="#">Find out how to add and edit trees near you!</a>-->
+        <p class="small">
+	  The Tree data based is based on a pilot project under the order of Hon. High Court of Bombay in PIL 93/2009. The Pune Municipal Corporation is conducting the pilot under the guidance of an expert committee. The data is collected using handhelds with Android app called 'Treemapindia'. The software on mobile and server is Free and Open Source. Community participation is expected to be used by the local authorities.
+	  <br/>
+	  <br/>
+	  <b>Guided by <a href="http://www.gise.cse.iitb.ac.in"> GISE Lab, CSE Dept, IIT Bombay</a></b>
         </p>
         <table width="100%">
         {% for tree in latest_trees %}

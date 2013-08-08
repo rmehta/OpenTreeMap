@@ -2,7 +2,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
     <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
-    <title>{% block title %}Urban Forest Map{% endblock %}</title>
+    <title>{% block title %}Pune Tree Map{% endblock %}</title>
 
         <script type="text/javascript">
           var tm_static = "{{ SITE_ROOT }}";
@@ -13,8 +13,9 @@
               geo_layer: '{{ GEOSERVER_GEO_LAYER }}',
               geo_style: '{{ GEOSERVER_GEO_STYLE }}',
               tc_layer_name: '{{ TILECACHE_LAYER }}',
+              tc_polygon_layer: '{{ TILECACHE_POLYGON_LAYER }}',
               site_root: '{{ SITE_ROOT }}',
-              qs_tile_url : '/qs_tiles/1.0.0/foo/' // layername is pulled from request.GET, can remove 'foo' eventually
+              qs_tile_url : '/qs_tiles/foo/' // layername is pulled from request.GET, can remove 'foo' eventually
           };
         </script>
 
@@ -55,6 +56,7 @@
 
 <!-- start: header -->
         <div id="header">
+	  <span class="big"> TreeMapIndia </span><span class="large bold"> Pune Tree Map</span>
             <ul id="nav">
                 <li>
                     {% if user.is_authenticated %}
@@ -75,12 +77,12 @@
             <div id="searchBoxContainer">
                 <ul id="searchTitles">
                     <li id="searchSpecies">Species or common name</li>
-                    <li id="searchLocation">Location</li>
+                    <li id="searchLocation">Prabhag</li>
                 </ul>
                 <ul id="searchBoxes">
                 <form method="get" action="{% url treemap.views.result_map %}" name="address" class="address" id="search_form">
                     <li id="searchSpeciesBox">
-                      <div id="searchSpeciesBrowse"><button>List</button></div>
+                      <div id="searchSpeciesBrowse"> List <!- <button>List</button> --> </div>
                       <input type="text"  id="species_search_input" value="All trees"
                        onFocus='if (this.value == "All trees") { this.value=""; };' />
                       <input type='hidden' name='species_search_id' id="species_search_id" />
@@ -88,8 +90,9 @@
                     </li>
                     <li id="searchJoiner">near</li>
                     <li id="searchLocationBox">
-                      <div id="searchLocationBrowse"><button>List</button></div>
-                        <input type="text"  name="location" onFocus="this.value=''" id="location_search_input" value="San Francisco, CA" />
+                      <div id="searchLocationBrowse"> List <!--<button>List</button> --> </div>
+		      
+                      <input type="text"  name="location" onFocus="this.value=''" id="location_search_input" value="Prabhag 3" />
                     </li>
                     <li id="searchButton"><input class="go" id="location_go" type="button" value="Search Tree Map" /></li>
                 </form>
@@ -97,15 +100,15 @@
                 <ul id="searchSuggest">
                     <li id="searchSpeciesSuggest">Examples:
 
-                        <a onclick='$("#species_search_input").val("Monterey Pine"); $("#species_search_id").val("28186"); $("#species_search_id").change();  return false' href="#">Monterey Pine</a>
-                        or <a onclick='$("#species_search_input").val("Cupressus macrocarpa"); $("#species_search_id").val("10672"); $("#species_search_id").change(); return false' href="#">Cupressus macrocarpa</a>
+                        <a onclick='$("#species_search_input").val("Christmas Tree"); $("#species_search_id").val("28186"); $("#species_search_id").change();  return false' href="#">Christmas Tree</a>
+                        or <a onclick='$("#species_search_input").val("Gulmohor"); $("#species_search_id").val("10672"); $("#species_search_id").change(); return false' href="#">Gulmohor</a>
 
                     </li>
 
                     <li id="searchLocationSuggest">Examples:
 
-                        <a onclick='$("#location_search_input").val("100 N Main St"); $("#location_search_input").change(); return false;' href="#">100 N Main St</a>,
-                        <a onclick='$("#location_search_input").val("My City"); $("#location_search_input").change(); return false;' href="#">My City</a>,
+                        <a onclick='$("#location_search_input").val("Prabhag 3"); $("#location_search_input").change(); return false;' href="#">Prabhag 3</a>,
+                        <a onclick='$("#location_search_input").val("Pune"); $("#location_search_input").change(); return false;' href="#">Pune</a>,
                         <a onclick='$("#location_search_input").val("10101"); $("#location_search_input").change(); return false;' href="#">10101</a>
                     </li>
                     <li id="searchFilter"><a href="#" id="advanced" class="advanced"><em><span id="close-filters">Show advanced filters</span></em></a> </li>
@@ -387,10 +390,11 @@
                            {% endif %}
                            {% if user.reputation.reputation > 1000 %}
                                <li><a href="{% url treemap.views.verify_edits %}">Recent Changes</a></li>
-                           {% endif %}
+                           {% endif %}			       
                         {% else %}
                             <li><a href="{{ SITE_ROOT }}accounts/login/">Login</a> or <a href="{{ SITE_ROOT }}accounts/register/" class="buttomSm">Sign up</a></li>
                         {% endif %}
+
                     </ul>
                 </div>
             </div>

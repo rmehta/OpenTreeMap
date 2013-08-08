@@ -1,8 +1,8 @@
-tm.start_zoom = 5;
+tm.start_zoom = 11;
 tm.add_start_zoom = 11;
 tm.add_zoom = 18;
 tm.edit_zoom = 18;
-tm.initial_location_string = "London UK";
+tm.initial_location_string = "Pune Maharastra";
 tm.initial_species_string = "All trees";
 tm.popup_minSize = new OpenLayers.Size(450,200);
 tm.popup_maxSize = new OpenLayers.Size(450,450);
@@ -25,7 +25,7 @@ tm.benefitUnitTransformer = function(k,v) {
     if (tm.benefitFactors[k]) {
         return parseInt(tm.benefitFactors[k] * v)
     } else {
-        console.log("* UNIT NOT CONVERTED *");
+        //console.log("* UNIT NOT CONVERTED *");
         return v;
     }
 };
@@ -34,7 +34,13 @@ tm.init_base_map = function(div_id, controls){
     if (!div_id) {
         div_id = "map";
     };
-    var restr = new OpenLayers.Bounds(-777364.0417177721, 6422865.926792589, 196913.04726422162, 7983783.306282676);
+
+    
+    var restr = new OpenLayers.Bounds(8185433.4763807785, 2078439.1106473138 , 8250778.017467333, 2134696.1302653584);
+    /*       
+	     (2073659.4742084444, 12393892.615558255,2073659.4742084444, 12393892.615558255)
+	     var restr = new OpenLayers.Bounds(-777364.0417177721, 6422865.926792589, 196913.04726422162, 7983783.306282676);
+*/
 
     if (!controls) {
         tm.map = new OpenLayers.Map(div_id, {
@@ -79,9 +85,20 @@ tm.init_base_map = function(div_id, controls){
             type: 'png',
             isBaseLayer: false,
             wrapDateLine: true,
-            attribution: "(c) UrbanForestMap.org"
+            attribution: "(c) treemapindia.in"
         }
     );
+    /*
+    tm.boundaries = new OpenLayers.Layer.TMS('PolygonLayer', 
+        tm_urls.tc_url,
+        {
+            layername: tm_urls.tc_polygon_layer,
+            type: 'png',
+            isBaseLayer: false,
+            wrapDateLine: true,
+        }
+    );
+    */
     tm.tms.buffer = 0;
     tm.baseLayer.buffer = 0;
     tm.aerial.buffer = 0;

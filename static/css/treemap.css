@@ -2,6 +2,48 @@ div #results_aside{
 height:370px;
 }
 
+.big
+{
+    font-size: 44px;
+}
+
+.bold{
+    font-weight: bold;
+}
+
+.large
+{
+    font-size: 34px;
+}
+
+.shadowLeft {
+    background: url("/static/images/ptm/map-shadow-left.png") no-repeat scroll -2px -2px transparent;
+    bottom: 0;
+    left: 0;
+    position: absolute;
+    top: 0;
+    width: 11px;
+    z-index: 1000;
+}
+
+.shadowTop {
+    background: url("/static/images/ptm/map-shadow-top.png") repeat-x scroll -2px -2px transparent;
+    height: 11px;
+    left: 9px;
+    position: absolute;
+    right: 0;
+    top: 0;
+    z-index: 1000;
+}
+
+.content .buttonSmall.mapToggle {
+    position:absolute;
+    top:10px;
+    right:10px;
+    z-index: 1000;
+	background-color: #333333;
+    font-size: 11px;
+}
 
 /* Tree Detail */
 .tree_detail_item{
@@ -17,6 +59,36 @@ margin:2px;
  float:right;
 }
 
+/* Tree Detail Comments */
+#tree_comments{
+ padding-top:10px;
+}
+
+.comment_field{
+ padding-bottom:4px;
+}
+.comment_list{
+ padding-top:10px;
+ clear:left;
+}
+.comment_item{
+ margin-bottom:8px;
+ padding-bottom:8px;
+ border-bottom: 1px dashed #ccc;
+}
+.comment_body{
+ padding-left:6px;
+}
+
+#id_comment{
+    height:100px;
+	border: 1px solid #ccc;
+}
+
+#comment_disclaimer {
+    padding-top:10px;
+    line-height:1.3em;
+}
 
 /* MAP */
 
@@ -29,48 +101,43 @@ height:400px;
 }
 #results_map{
 position:relative;
-height:480px;
-width:622px;
-}
-#results_map_wrap{
-height:480px;
-width:622px;
-border:10px solid #eef5d8;
-overflow: hidden;
-position:relative;
+height:524px;
+clear:both;
+border:1px solid #ccc;
 }
 #favorite_tree_map{
 height:250px;
-width:260px;
-border:10px solid #eef5d8;
+border: 1px solid #ccc;
+position: relative;
 }
-#edit_tree_map_wrap{
-height:220px;
-width:260px;
-border:10px solid #eef5d8;
-overflow: hidden;
-position:relative;
-}
+
 #edit_tree_map{
 height:220px;
-width:260px;
+width:248px;
+border:1px solid #ccc;
 overflow: hidden;
 position:relative;
 }
-#add_tree_map_wrap{
-position:relative;
+#alternate_tree_div {
+	background: none repeat scroll 0 0 #B8E0D2;
+    font-weight: bold;
+    padding: 3px;
+    text-align: center;
+	border:1px solid #ccc;
+	border-top: none;
+}
+#alternate_tree_div a {
+ color: #128D60
+}
+
+#add_tree_map {
 float:left;
 width: 630px;
 height:350px;
-border:10px solid #eef5d8;
-overflow: hidden;
+position: relative;
+border: 1px solid #ccc;
 }
-#add_tree_map{
-position:relative;
-width: 630px;
-height:350px;
-overflow: hidden;
-}
+
 #add_tree_map #geocode_address {
 position: absolute;
 right: 10px;
@@ -90,14 +157,10 @@ filter: alpha(opacity=90);
 float:left;
 background: #fff;
 border: 1px solid #ccc;
-min-height: 338px;
+min-height: 320px;
 margin-left: 15px;
 padding: 15px;
 width: 205px;
-}
-.addMap{
-margin-left:210px;
-margin-bottom:15px;
 }
 #static_map{
 height:40px;%
@@ -106,8 +169,8 @@ width:40px;
 
 #tree_streetview{
 height:220px;
-width:260px;
-border:10px solid #eef5d8;
+width:248px;
+border:1px solid #ccc;
 padding-top:0;
 margin-top:0;
 }
@@ -117,7 +180,7 @@ width:270px;
 }
 #max_tree_infowindow{
 width:390px;
-min-height:225px;
+min-height:170px;
 background: #fff;
 margin:0;
 padding:0;
@@ -153,7 +216,7 @@ color:#555;
 .activeEdit {
     margin: 0;
     padding: 0;
-    width: 90%;
+    width: 150px;
 /*
     background-color: #ccc;
     border: 1px solid red;
@@ -168,38 +231,24 @@ ul.edit .activeEdit input {
 ul.edit .activeEdit button, input.button {
 	float:left;
 	width:50px;
-	background: #fff url(../images/v2/buttonsm_bg.gif) repeat-x center center;
-	border:2px solid #d8731a;
-	text-align:center;
-	color:#FFFFFF;
-	font-size:11px;
-	font-weight:bold;
-	padding:2px 5px;
-	margin:7px 10px 7px 0;
-	cursor: pointer;
-}
-ul.edit .activeEdit button:hover {
-	background:#e08a00;
-	text-decoration:none;
+	
 } 
-.activeEdit button, input.button {
+input.button {
 	clear:both;
-	background: #fff url(../images/v2/buttonsm_bg.gif) repeat-x center center;
-	border:2px solid #d8731a;
-	text-align:center;
-	color:#FFFFFF;
-	font-size:11px;
-	font-weight:bold;
-	padding:2px 5px;
 	margin:7px 10px 7px -6px;
 	cursor: pointer;
 }
+.activeEdit button {
+  clear:none;
+	margin:7px 10px 7px -6px;
+	cursor: pointer;
+}
+
 input.button {
     margin-top:-2px;
 }
 .activeEdit button:hover {
-	background:#e08a00;
-	text-decoration:none;
+
 }    
 .activeEdit input, .activeEdit select {
 /*     display: block; */
@@ -224,10 +273,6 @@ input.button {
 .activeEdit select {
     width:195px;
 }
-.activeEdit #month_, .activeEdit #day_, .activeEdit #year_ {
-    width: 55px;
-    margin: 0;
-}
 #actionTypeSelection select, #hazardTypeSelection select {
     width:125px;
 }
@@ -240,48 +285,16 @@ input.button {
 }
 #hazardTable, #actionTable {
     font-size:12px;
-}
 
-#feet_, #inches_ {
+}
+#month_, #day_ {
     width:50px;
-    margin-right:20px;
+    padding-right:20x;
+    margin-right:10px;
 }
-
-#max_polygon_infowindow {
-    padding-left: 8px;
-}
-#max_polygon_infowindow h3 {
-    background: #FFF;
-    font-family: 'Delicious Heavy', serif;
-    font-size: 20px;
-    color: #38AF8D;
-    font-weight: normal;
-    margin: 4px 0 10px;
-}
-#max_polygon_infowindow a {
-    font-size: 13px;
-    font-weight: bold;
-    padding: 0 0 0 20px;
-    background: url(../images/icon_popover_edit.png) no-repeat center left;
-    margin: 10px 0 2px 0;
-    color: #38AF8D;
-    display: block;
-}
-#max_polygon_infowindow .polygon_infowindow_row {
-    clear: both;
-}
-#max_polygon_infowindow .polygon_infowindow_row:hover {
-    background: #EEF5D8;
-}
-#max_polygon_infowindow .polygon_infowindow_row .label {
-    width: 100px;
-    float: left;
-    padding: 3px 8px 3px 3px;
-    color: #999;
-}
-#max_polygon_infowindow .polygon_infowindow_row .results {
-    padding: 3px 8px 3px 10px;
-    color: #666;
+#year_ {
+    width:65px;
+    padding-right:20x;
 }
 
 
@@ -292,21 +305,12 @@ cursor:pointer;
 
 /* OPEN LAYERS CONTROLS */
 
-.content .buttomSm.mapToggle {
-    position:absolute;
-    top:10px;
-    right:10px;
-    z-index: 1000;
-	background-color: #333333;
-    font-size: 11px;
-}
-
 .olControlPanPanel {
     left: 10px !important;
     top: 10px !important;
 }
 .olControlPanPanel div {
-    background-image: url("../images/pan-sprite.png") !important;
+    background-image: url("/static/images/ptm/pan-sprite.png") !important;
 	position:absolute
 }
 .olControlPanPanel .olControlPanNorthItemInactive {
@@ -357,7 +361,7 @@ cursor:pointer;
 }
 
 .olControlZoomPanel div {
-	background-image: url("../images/zoom-sprite.png") !important;
+	background-image: url("/static/images/ptm/zoom-sprite.png") !important;
 	background-repeat: no-repeat;
 	position:absolute
 }

@@ -10,7 +10,7 @@ from django.contrib.auth.models import User
 from treemap.models import Species, Tree, Plot, Neighborhood, ZipCode, TreeFlags, ImportEvent
 
 # Load CHOICES from your implementation-specific file (e.g. "from choices_SanDiego import *")
-from choices import CHOICES as choices
+from local_settings import CHOICES as choices
 
 class Command(BaseCommand):
     args = '<input_file_name, data_owner_id, base_srid, read_only>'

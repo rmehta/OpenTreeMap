@@ -12,8 +12,11 @@ ADD_FORM_TARGETS = [
     ('edit','Let me continue editing this tree'),
     ('view', "I'm done!"),
 ]
+
 ADD_FORM_TARGETS_DEFAULT = 'view'
 API_KEY_GOOGLE_MAP = '' # Can be empty
+#'AIzaSyDx1906lCgpqHNeJp0cjhW3YDvEu7E6Jts' #client key
+#'AIzaSyC8754FBa5vNIXJhnS_KtyPol07r0JhbBc' #server key 110.
 API_KEY_GOOGLE_ANALYTICS = 'your-key-here'
 
 POSTAL_CODE_FIELD = "USZipCodeField"
@@ -79,7 +82,7 @@ try:
 except ImportError, e:
    pass
 
-OTM_VERSION = "1.2"
+OTM_VERSION = "1.3"
 API_VERSION = "0.1"
 
 TEMPLATE_DEBUG = DEBUG
@@ -141,6 +144,8 @@ MIDDLEWARE_CLASSES = (
 try:
     from local_settings import *
 except ImportError, exp:
+    print 'import fail'
+    print exp
     pass
 
 if SITE_ROOT is not "/":
