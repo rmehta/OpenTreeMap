@@ -19,7 +19,8 @@ var I = {};
             return loadTemplateCache[t];
         }
     };
-    I.loadTemplate = loadTemplate
+
+    I.loadTemplate = loadTemplate;
 
     /** Dummy function (for now) **/
     I.signalError = function(error) {};
@@ -101,10 +102,16 @@ var I = {};
         }
 
         var rowModel = mergeModels.data[row.row];
+        var rowData = {};
+        for (var i=0;i<rowModel.data.length;i+=1) {
+            rowData[rowModel.data[i].field] = rowModel.data[i];
+        }
+        rowModel.indexed_data = rowData;
 
         var $merge = $(
             _.template($("#merge-template").html(),
-                       { 'fields': rowModel}));
+                       { 'fields': rowModel,
+                         'field_order': panel.data.field_order }));
 
         // Select the correct checkboxes
         updateCheckboxState(rowModel, $merge);
@@ -400,7 +407,7 @@ var I = {};
             header += '<th>Plot</th>';
         }
 
-        header = _.chain(rows.fields)
+        header = _.chain(panel.data.field_order)
             .map(function(f) { return '<th>' + f + '</th>'; })
             .reduce(concat, header)
             .value();
@@ -426,9 +433,17 @@ var I = {};
                                    'Plot #' + row.plot_id + '</a></td>');
                     }
 
+                    // Key data by field name
+                    var rowdata = {};
                     for (var i=0;i<row.data.length;i++) {
                         var key = rows.fields[i];
                         var fld = row.data[i];
+                        rowdata[key] = fld;
+                    }
+
+                    for (var i=0;i<panel.data.field_order.length;i++) {
+                        var key = panel.data.field_order[i];
+                        var fld = rowdata[key];
 
                         var $td = $('<td></td>');
                         if (errors[key]) {
@@ -560,7 +575,8 @@ var I = {};
 
     function getContentForMoreSpeciesOptions(flds, row) {
         var source = _.map(TM.speciesData, function(d) {
-            return d.cname + " [" + d.sname + "]";
+            var sciname = d.genus + ' ' + d.species + ' ' + d.cultivar + ' ' + d.other_part;
+            return d.cname + " [" + sciname + "]";
         });
 
         var $content = $(loadTemplate("species-error-more-content")({
@@ -898,16 +914,10 @@ I.init.status = function() {
      */
     I.rt = {
         tree_panels: {
-            success: {
-                request_key: 'success',
-                name: 'success',
-                display_name: 'Success',
-                page: 0
-            },
-            pending: {
-                request_key: 'waiting',
-                name: 'pending',
-                display_name: 'Pending',
+            verified: {
+                request_key: 'verified',
+                name: 'verified',
+                display_name: 'Ready to Add',
                 page: 0
             },
             errors: {
@@ -922,18 +932,24 @@ I.init.status = function() {
                 display_name: 'Tree Watch',
                 page: 0
             },
-            verified: {
-                request_key: 'verified',
-                name: 'verified',
-                display_name: 'Verified',
+            success: {
+                request_key: 'success',
+                name: 'success',
+                display_name: 'Successfully Added',
+                page: 0
+            },
+            pending: {
+                request_key: 'waiting',
+                name: 'pending',
+                display_name: 'Pending',
                 page: 0
             }
         },
         species_panels: {
-            success: {
-                request_key: 'success',
-                name: 'success',
-                display_name: 'Success',
+            newspecies: {
+                request_key: 'verified',
+                name: 'verified',
+                display_name: 'Ready to Add',
                 page: 0
             },
             merge_req: {
@@ -948,10 +964,10 @@ I.init.status = function() {
                 display_name: 'Errors',
                 page: 0
             },
-            newspecies: {
-                request_key: 'verified',
-                name: 'verified',
-                display_name: 'Ready to Create',
+            success: {
+                request_key: 'success',
+                name: 'success',
+                display_name: 'Successfully Added',
                 page: 0
             }
         }
@@ -1003,7 +1019,7 @@ I.init.status = function() {
 };
 
 I.init.list = function() {
-    I.api_prefix = '/importer/api/';
+    I.api_prefix = tm_urls.site_root + 'importer/api/';
 
     // Auto-updater
     var numPrevSpeciesCounts = -1;
@@ -1035,61 +1051,71 @@ I.init.list = function() {
     }
 
     // Create unit types dialog
-    var $unitsDialog = $("#unitsdialog");
-
     var conversions =
         { "Inches" : 1.0,
           "Meters": 39.3701,
-          "Centimeters": 0.393701 }
+          "Centimeters": 0.393701 };
 
-    var $select = _.reduce(conversions, function ($sel,factor,label) {
-        return $sel.append($("<option>")
-                           .attr("value",factor)
-                           .text(label));
-    }, $("<select>"));
+    function setupUnitsDialog($unitsDialog, $submit, $form) {
 
-    $unitsDialog.find("tr").each(function (i,row) {
-        if (i > 0) {
-            $(row).append($("<td>").append($select.clone()));
-        }
-    });
+        var $select = _.reduce(conversions, function ($sel,factor,label) {
+            return $sel.append($("<option>")
+                               .attr("value",factor)
+                               .text(label));
+        }, $("<select>"));
 
-    $("body").append($unitsDialog);
-
-    $unitsDialog.dialog({
-        autoOpen: false,
-        width: 350,
-        modal: true
-    });
-
-    $("#submittree").click(function() {
-        $unitsDialog.dialog('open');
-    });
-
-    $unitsDialog.find(".cancel").click(function() {
-        $unitsDialog.dialog('close');
-    });
-
-    $unitsDialog.find(".create").click(function() {
-        var fields = {};
-        // Extract field values
         $unitsDialog.find("tr").each(function (i,row) {
             if (i > 0) {
-                var tds = $(row).find("td");
-                fields["unit_" + tds.first().html().replace(" ","_").toLowerCase()] =
-                    tds.last().find("select").val();
+                $(row).append($("<td>").append($select.clone()));
             }
         });
 
-        // Update hidden format fields
-        var $form = $("#treeform");
-        _.each(fields, function(val,label) {
-            $form.find("input[name=" + label  + "]")
-                .attr("value", val);
+        $("body").append($unitsDialog);
+
+        $unitsDialog.dialog({
+            autoOpen: false,
+            width: 350,
+            modal: true
         });
 
-        $form.submit();
-    });
+        $submit.click(function() {
+            $unitsDialog.dialog('open');
+        });
+
+        $unitsDialog.find(".cancel").click(function() {
+            $unitsDialog.dialog('close');
+        });
+
+        $unitsDialog.find(".create").click(function() {
+            var fields = {};
+            // Extract field values
+            $unitsDialog.find("tr").each(function (i,row) {
+                if (i > 0) {
+                    var tds = $(row).find("td");
+                    fields["unit_" + tds.first().html().replace(" ","_").toLowerCase()] =
+                        tds.last().find("select").val();
+                }
+            });
+
+            // Update hidden format fields
+            _.each(fields, function(val,label) {
+                $form.find("input[name=" + label  + "]")
+                    .attr("value", val);
+            });
+
+            $form.submit();
+        });
+    }
+
+
+    setupUnitsDialog($("#treeunitsdialog"),
+                    $("#submittree"),
+                    $("#treeform"));
+
+    setupUnitsDialog($("#speciesunitsdialog"),
+                    $("#submitspecies"),
+                    $("#speciesform"));
+
 
     // Start the updater
     update_counts();

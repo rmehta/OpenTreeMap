@@ -17,7 +17,17 @@
 
 {% block middle_panel %}
 
-  <div id="unitsdialog">
+  <div id="speciesunitsdialog">
+    <table>
+      <tr><th>Field</th><th>Unit</th></tr>
+      <tr><td>Max DBH</td></tr>
+      <tr><td>Max Height</td></tr>
+    </table>
+    <button class="create">Create</button>
+    <button class="cancel">Cancel</button>
+  </div>
+
+  <div id="treeunitsdialog">
     <table>
       <tr><th>Field</th><th>Unit</th></tr>
       <tr><td>Plot Length</td></tr>
@@ -47,11 +57,11 @@
   </div>
   <div class="importer-upload">
     <h2>Species Import</h2>
-    <form method="POST" action="{% url 'importer.views.create' %}" enctype="multipart/form-data">
+    <form id="speciesform" method="POST" action="{% url 'importer.views.create' %}" enctype="multipart/form-data">
       <input type="hidden" name="type" value="species"></input>
       File to Upload: <input type="file" name="file"></input>
-      <input type="submit" name="go" value="Go &raquo;" class="btn btn-success"></input>
     </form>
+    <button id="submitspecies" class="btn btn-success">Go &raquo;</button>
   </div>
 </div>
 
@@ -73,6 +83,11 @@
     <h2>Finished Species Imports</h2>
     {% include 'importer/partials/import_table.html' with things=species_finished id="finishedspecies" link="species" %}
   </div>
+  <h3>
+    <a href="{{ SITE_ROOT }}importer/export/species/all">
+      Export All Species
+    </a>
+  </h3>
 </div>
 
 {% endblock %}

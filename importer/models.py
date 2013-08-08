@@ -35,6 +35,8 @@ class GenericImportEvent(models.Model):
     # Global errors and notices (json)
     errors = models.TextField(default='')
 
+    field_order = models.TextField(default='')
+
     # Metadata about this particular import
     owner = models.ForeignKey(User)
     created = models.DateTimeField(auto_now=True)
@@ -113,6 +115,10 @@ class SpeciesImportEvent(GenericImportEvent):
     A TreeImportEvent represents an attempt to upload a csv containing
     species information
     """
+
+    max_diameter_conversion_factor = models.FloatField(default=1.0)
+    max_tree_height_conversion_factor = models.FloatField(default=1.0)
+
     def create_row(self, *args, **kwargs):
         return SpeciesImportRow.objects.create(*args, **kwargs)
 
@@ -175,8 +181,6 @@ class TreeImportEvent(GenericImportEvent):
 
     base_import_event = models.ForeignKey(ImportEvent)
 
-    # We can do some numeric conversions
-    # TODO: Support numeric conversions
     plot_length_conversion_factor = models.FloatField(default=1.0)
     plot_width_conversion_factor = models.FloatField(default=1.0)
     diameter_conversion_factor = models.FloatField(default=1.0)
@@ -375,6 +379,14 @@ class GenericImportRow(models.Model):
         else:
             return i
 
+    def convert_units(self, data, converts):
+        INCHES_TO_DBH_FACTOR = 1.0 / settings.DBH_TO_INCHES_FACTOR
+
+        # Similar to tree
+        for fld, factor in converts.iteritems():
+            if fld in data and factor != 1.0:
+                data[fld] = float(data[fld]) * factor * INCHES_TO_DBH_FACTOR
+
     def validate_numeric_fields(self):
         def cleanup(fields, fn):
             has_errors = False
@@ -418,18 +430,10 @@ class GenericImportRow(models.Model):
             value = self.datadict.get(field, None)
             if value:
                 all_choices = settings.CHOICES[choice_key]
-                choices = { value for (id,value) in all_choices }
+                choices = { value: id for (id, value) in all_choices }
 
                 if value in choices:
-                    # Some plot choice fields aren't automatically
-                    # converting to choice values so we do it forcibly
-                    # here
-                    if field in self.model_fields.PLOT_CHOICES:
-                        self.cleaned[field] = [id for (id,v)
-                                                    in all_choices
-                                                    if v == value][0]
-                    else:
-                        self.cleaned[field] = value
+                    self.cleaned[field] = choices[value]
                 else:
                     has_errors = True
                     self.append_error(errors.INVALID_CHOICE,
@@ -756,6 +760,15 @@ class SpeciesImportRow(GenericImportRow):
         if species is None:
             species = Species()
 
+        # Convert units
+        self.convert_units(data, {
+            fields.species.MAX_DIAMETER:
+            self.import_event.max_diameter_conversion_factor,
+
+            fields.species.MAX_HEIGHT:
+            self.import_event.max_tree_height_conversion_factor
+        })
+
         #TODO: Update tree count nonsense
 
         for modelkey, importdatakey in SpeciesImportRow.SPECIES_MAP.iteritems():
@@ -788,6 +801,36 @@ class TreeImportRow(GenericImportRow):
     WATCH=2
     VERIFIED=4
 
+    PLOT_MAP = {
+        'geometry': fields.trees.POINT,
+        'width': fields.trees.PLOT_WIDTH,
+        'length': fields.trees.PLOT_LENGTH,
+        'type': fields.trees.PLOT_TYPE,
+        'readonly': fields.trees.READ_ONLY,
+        'sidewalk_damage': fields.trees.SIDEWALK,
+        'powerline_conflict_potential': fields.trees.POWERLINE_CONFLICT,
+        'owner_orig_id': fields.trees.ORIG_ID_NUMBER,
+        'owner_additional_id': fields.trees.DATA_SOURCE,
+        'owner_additional_properties': fields.trees.NOTES
+    }
+
+    TREE_MAP = {
+        'tree_owner': fields.trees.OWNER,
+        'steward_name': fields.trees.STEWARD,
+        'dbh': fields.trees.DIAMETER,
+        'height': fields.trees.TREE_HEIGHT,
+        'canopy_height': fields.trees.CANOPY_HEIGHT,
+        'species': fields.trees.SPECIES_OBJECT,
+        'sponsor': fields.trees.SPONSOR,
+        'date_planted': fields.trees.DATE_PLANTED,
+        'readonly': fields.trees.READ_ONLY,
+        'projects': fields.trees.LOCAL_PROJECTS,
+        'condition': fields.trees.TREE_CONDITION,
+        'canopy_condition': fields.trees.CANOPY_CONDITION,
+        'url': fields.trees.URL,
+        'pests': fields.trees.PESTS
+    }
+
     # plot that was created from this row
     plot = models.ForeignKey(Plot, null=True, blank=True)
 
@@ -811,21 +854,22 @@ class TreeImportRow(GenericImportRow):
         # Get our data
         data = self.cleaned
 
-        # Convert units
-        converts = {
-            fields.trees.PLOT_WIDTH: self.import_event.plot_width_conversion_factor,
-            fields.trees.PLOT_LENGTH: self.import_event.plot_length_conversion_factor,
-            fields.trees.DIAMETER: self.import_event.diameter_conversion_factor,
-            fields.trees.TREE_HEIGHT: self.import_event.tree_height_conversion_factor,
-            fields.trees.CANOPY_HEIGHT: self.import_event.canopy_height_conversion_factor
-        }
+        self.convert_units(data, {
+            fields.trees.PLOT_WIDTH:
+            self.import_event.plot_width_conversion_factor,
 
-        INCHES_TO_DBH_FACTOR = 1.0 / settings.DBH_TO_INCHES_FACTOR
+            fields.trees.PLOT_LENGTH:
+            self.import_event.plot_length_conversion_factor,
 
-        for fld, factor in converts.iteritems():
-            if fld in data and factor != 1.0:
-                data[fld] = float(data[fld]) * factor * INCHES_TO_DBH_FACTOR
+            fields.trees.DIAMETER:
+            self.import_event.diameter_conversion_factor,
 
+            fields.trees.TREE_HEIGHT:
+            self.import_event.tree_height_conversion_factor,
+
+            fields.trees.CANOPY_HEIGHT:
+            self.import_event.canopy_height_conversion_factor
+        })
 
         # We need the import event from treemap.models
         # the names of things are a bit odd here but
@@ -861,37 +905,7 @@ class TreeImportRow(GenericImportRow):
 
         data_owner = self.import_event.owner
 
-        plot_map = {
-            'geometry': fields.trees.POINT,
-            'width': fields.trees.PLOT_WIDTH,
-            'length': fields.trees.PLOT_LENGTH,
-            'type': fields.trees.PLOT_TYPE,
-            'readonly': fields.trees.READ_ONLY,
-            'sidewalk_damage': fields.trees.SIDEWALK,
-            'powerline_conflict_potential': fields.trees.POWERLINE_CONFLICT,
-            'owner_orig_id': fields.trees.ORIG_ID_NUMBER,
-            'owner_additional_id': fields.trees.DATA_SOURCE,
-            'owner_additional_properties': fields.trees.NOTES
-        }
-
-        tree_map = {
-            'tree_owner': fields.trees.OWNER,
-            'steward_name': fields.trees.STEWARD,
-            'dbh': fields.trees.DIAMETER,
-            'height': fields.trees.TREE_HEIGHT,
-            'canopy_height': fields.trees.CANOPY_HEIGHT,
-            'species': fields.trees.SPECIES_OBJECT,
-            'sponsor': fields.trees.SPONSOR,
-            'date_planted': fields.trees.DATE_PLANTED,
-            'readonly': fields.trees.READ_ONLY,
-            'projects': fields.trees.LOCAL_PROJECTS,
-            'condition': fields.trees.TREE_CONDITION,
-            'canopy_condition': fields.trees.CANOPY_CONDITION,
-            'url': fields.trees.URL,
-            'pests': fields.trees.PESTS
-        }
-
-        for modelkey, importdatakey in plot_map.iteritems():
+        for modelkey, importdatakey in TreeImportRow.PLOT_MAP.iteritems():
             importdata = data.get(importdatakey, None)
 
             if importdata:
@@ -903,7 +917,7 @@ class TreeImportRow(GenericImportRow):
             plot.import_event = base_treemap_import_event
             plot.save()
 
-        for modelkey, importdatakey in tree_map.iteritems():
+        for modelkey, importdatakey in TreeImportRow.TREE_MAP.iteritems():
             importdata = data.get(importdatakey, None)
 
             if importdata:

@@ -68,7 +68,8 @@
         <th>Field</th>
         <% _.each(fields.header, function(f) { %><th><%= f %></th><% }) %>
       </tr>
-      <% _.each(fields.data, function(f) { %>
+      <% _.each(field_order, function(fo) {
+         var f = fields.indexed_data[fo]; %>
       <tr data-field="<%= f.field %>">
         <td>
           <%= f.field %></td>
@@ -81,9 +82,9 @@
       </tr>
       <% }) %>
       <tr><td></td>
-        <td><button data-matches="new">Create New</button></td>
+        <td><button data-matches="new">Create New Species</button></td>
       <% _.each(fields.keys, function(k) { %>
-        <td><button data-matches="<%= k %>">Select Species</button></td>
+        <td><button data-matches="<%= k %>">Merge Species</button></td>
       <% }); %>
     </table>
     </div>
@@ -122,7 +123,9 @@
     <div id="tabs"></div>
   </div>
 
-  <button id="createtrees" class="btn btn-success btn-large">Create Objects &raquo;</button>
+  <button id="createtrees" class="btn btn-success btn-large">Add to TreeZilla &raquo;</button>
+
+  <a href="{% url 'importer.views.list_imports' %}"><button class="btn btn-success btn-large">Back to Uploads</button></a>
 {% endif %}
 
 {% endblock %}
