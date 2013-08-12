@@ -129,7 +129,7 @@ def android_data_parse(sourceFile):
 
     of.writerow(["ID","POINT_X","POINT_Y","SCIENTIFIC","ADDRESS","PLOTTYPE","PLOTLENGTH","PLOTWIDTH","POWERLINE","OWNER","STEWARD","SPONSOR","DATEPLANTED","DIAMETER","HEIGHT","CANOPYHEIGHT","CONDITION","CANOPYCONDITION"])
 
-    import pdb; pdb.set_trace();
+    #import pdb; pdb.set_trace();
     for row in CsvFile:
         try:
             # inputfile schema: _id, form_no, prop_id, tree_no, tree_name, botanical_, girth_cm, girth_m, height_ft, height_m, nest, burrows, flowers, fruits, nails, poster, wires, tree_guard, other_menu, other_me_1, health_of_, found_on_g, ground_des, risk_on_tr, risk_desc, rare, endangered, vulenrable, pest_affec, refer_to_d, special_ot, special__1, latitude, longitude, creation_d, Device_Id, Time, Date
@@ -139,23 +139,15 @@ def android_data_parse(sourceFile):
             id1 = mapping[row[0]]
             id2 = (4-len(str(row[1])))*'0'+row[1]
             _id= int(id1+id2)
-            lon = float(row[3])
-            lat=float(row[4])
-            try:
-                sci_name = Species.objects.get(common_name=row[2]).scientific_name
-                genus = sci_name.split(" ")[0]
-                species = sci_name.split(" ")[1]
-            except:
-                # if no direct match found, search wider
-                sci_name= Species.objects.filter(common_name__icontains=row[2])
-                if sci_name:
-                    sci_name= sci_name[0].scientific_name
-                    genus = sci_name.split(" ")[0]
-                    species = sci_name.split(" ")[1]                
-                else:
-                    sci_name=""
-                    genus = ""
-                    species = ""                                      
+            
+            #ID=form_no*100000+tree_no (3_15 consider it as 315*100000+tree_no).
+            _id = int(row(schema.index('form_no')).replace('_',''))*100000+int(row(schema.index('tree_no')))
+            point_x = row(schema.index('longitude'))
+            point_y = row(schema.index('latitude'))
+            sci_name = row(schema.index('botanical_'))
+            genus = sci_name.split(" ")[0]
+            species = sci_name.split(" ")[1]
+                            
             cultivar=""
             gender=""
             address=""
